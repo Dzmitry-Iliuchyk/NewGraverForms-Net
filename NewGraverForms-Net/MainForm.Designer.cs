@@ -126,12 +126,12 @@
             // button_selectFile
             // 
             button_selectFile.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button_selectFile.Location = new Point(5, 197);
+            button_selectFile.Location = new Point(30, 197);
             button_selectFile.Margin = new Padding(2, 3, 2, 3);
             button_selectFile.Name = "button_selectFile";
-            button_selectFile.Size = new Size(161, 43);
+            button_selectFile.Size = new Size(136, 43);
             button_selectFile.TabIndex = 5;
-            button_selectFile.Text = "Выбрать файл";
+            button_selectFile.Text = "Select a file";
             button_selectFile.UseVisualStyleBackColor = true;
             button_selectFile.Click += button_selectFile_Click;
             // 
@@ -142,9 +142,9 @@
             label_selectedFile.Location = new Point(5, 51);
             label_selectedFile.Margin = new Padding(2, 0, 2, 0);
             label_selectedFile.Name = "label_selectedFile";
-            label_selectedFile.Size = new Size(113, 25);
+            label_selectedFile.Size = new Size(120, 25);
             label_selectedFile.TabIndex = 4;
-            label_selectedFile.Text = " Не выбран";
+            label_selectedFile.Text = "Not selected";
             // 
             // selectedFile
             // 
@@ -153,9 +153,9 @@
             selectedFile.Location = new Point(5, 12);
             selectedFile.Margin = new Padding(2, 0, 2, 0);
             selectedFile.Name = "selectedFile";
-            selectedFile.Size = new Size(297, 25);
+            selectedFile.Size = new Size(198, 25);
             selectedFile.TabIndex = 3;
-            selectedFile.Text = "Выбранный файл маркировки:";
+            selectedFile.Text = "Selected marking file:";
             // 
             // buttonAxisControl
             // 
@@ -165,7 +165,7 @@
             buttonAxisControl.Name = "buttonAxisControl";
             buttonAxisControl.Size = new Size(128, 67);
             buttonAxisControl.TabIndex = 7;
-            buttonAxisControl.Text = "Управление осями";
+            buttonAxisControl.Text = "Axis control";
             buttonAxisControl.UseVisualStyleBackColor = true;
             buttonAxisControl.Click += buttonAxisControl_Click;
             // 
@@ -176,9 +176,9 @@
             labelSetUpSettings.Location = new Point(11, 12);
             labelSetUpSettings.Margin = new Padding(2, 0, 2, 0);
             labelSetUpSettings.Name = "labelSetUpSettings";
-            labelSetUpSettings.Size = new Size(304, 25);
+            labelSetUpSettings.Size = new Size(218, 25);
             labelSetUpSettings.TabIndex = 6;
-            labelSetUpSettings.Text = "Настройте положение осей XY";
+            labelSetUpSettings.Text = "Adjust XY axes position";
             // 
             // labelSetUp
             // 
@@ -187,47 +187,48 @@
             labelSetUp.Location = new Point(5, 16);
             labelSetUp.Margin = new Padding(2, 0, 2, 0);
             labelSetUp.Name = "labelSetUp";
-            labelSetUp.Size = new Size(190, 25);
+            labelSetUp.Size = new Size(159, 25);
             labelSetUp.TabIndex = 8;
-            labelSetUp.Text = "Настройте высоту:";
+            labelSetUp.Text = "Set up the height";
             // 
             // button_set_auto_height
             // 
             button_set_auto_height.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button_set_auto_height.Location = new Point(11, 91);
+            button_set_auto_height.Location = new Point(33, 77);
             button_set_auto_height.Margin = new Padding(2, 3, 2, 3);
             button_set_auto_height.Name = "button_set_auto_height";
-            button_set_auto_height.Size = new Size(78, 44);
+            button_set_auto_height.Size = new Size(91, 59);
             button_set_auto_height.TabIndex = 9;
-            button_set_auto_height.Text = "Авто";
+            button_set_auto_height.Text = "Auto measure";
             button_set_auto_height.UseVisualStyleBackColor = true;
             button_set_auto_height.Click += button_set_auto_height_Click;
             // 
             // labelAutoHeight
             // 
             labelAutoHeight.AutoSize = true;
-            labelAutoHeight.Location = new Point(102, 105);
+            labelAutoHeight.Location = new Point(146, 96);
             labelAutoHeight.Name = "labelAutoHeight";
-            labelAutoHeight.Size = new Size(119, 20);
+            labelAutoHeight.Size = new Size(0, 20);
             labelAutoHeight.TabIndex = 15;
-            labelAutoHeight.Text = "labelAutoHeight";
             // 
             // buttonAcceptHeight
             // 
             buttonAcceptHeight.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            buttonAcceptHeight.Location = new Point(274, 90);
+            buttonAcceptHeight.Location = new Point(346, 92);
             buttonAcceptHeight.Margin = new Padding(2, 3, 2, 3);
             buttonAcceptHeight.Name = "buttonAcceptHeight";
             buttonAcceptHeight.Size = new Size(118, 44);
             buttonAcceptHeight.TabIndex = 14;
-            buttonAcceptHeight.Text = "Применить";
+            buttonAcceptHeight.Text = "Submit";
             buttonAcceptHeight.UseVisualStyleBackColor = true;
+            buttonAcceptHeight.Click += buttonAcceptHeight_Click;
             // 
             // textBoxHeight
             // 
             textBoxHeight.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBoxHeight.Location = new Point(274, 45);
+            textBoxHeight.Location = new Point(346, 47);
             textBoxHeight.Margin = new Padding(3, 4, 3, 4);
+            textBoxHeight.MaxLength = 4;
             textBoxHeight.Name = "textBoxHeight";
             textBoxHeight.Size = new Size(118, 34);
             textBoxHeight.TabIndex = 13;
@@ -237,16 +238,16 @@
             // 
             labelZshift.AutoSize = true;
             labelZshift.ForeColor = SystemColors.ControlDarkDark;
-            labelZshift.Location = new Point(274, 21);
+            labelZshift.Location = new Point(346, 23);
             labelZshift.Name = "labelZshift";
             labelZshift.Size = new Size(118, 20);
             labelZshift.TabIndex = 11;
-            labelZshift.Text = "Высота обьекта";
+            labelZshift.Text = "Height to object";
             // 
             // comboBoxMaterial
             // 
             comboBoxMaterial.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxMaterial.Location = new Point(124, 24);
+            comboBoxMaterial.Location = new Point(155, 24);
             comboBoxMaterial.Margin = new Padding(3, 4, 3, 4);
             comboBoxMaterial.Name = "comboBoxMaterial";
             comboBoxMaterial.Size = new Size(138, 28);
@@ -258,9 +259,9 @@
             labelMaterial.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
             labelMaterial.Location = new Point(15, 20);
             labelMaterial.Name = "labelMaterial";
-            labelMaterial.Size = new Size(103, 28);
+            labelMaterial.Size = new Size(88, 28);
             labelMaterial.TabIndex = 0;
-            labelMaterial.Text = "Материал";
+            labelMaterial.Text = "Material:";
             // 
             // buttonManualStart
             // 
@@ -327,7 +328,7 @@
             buttonAcceptMaterial.Name = "buttonAcceptMaterial";
             buttonAcceptMaterial.Size = new Size(98, 32);
             buttonAcceptMaterial.TabIndex = 2;
-            buttonAcceptMaterial.Text = "Применить";
+            buttonAcceptMaterial.Text = "Submit";
             buttonAcceptMaterial.UseVisualStyleBackColor = true;
             // 
             // mainTabControl
@@ -447,6 +448,7 @@
             buttonBackTab.TabIndex = 16;
             buttonBackTab.Text = "Back";
             buttonBackTab.UseVisualStyleBackColor = true;
+            buttonBackTab.Click += buttonBackTab_Click;
             // 
             // MainForm
             // 

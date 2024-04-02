@@ -2,8 +2,9 @@
 {
     public class TabControlHelper
     {
-        Action OnFirstPage;
-        Action OnLastPage;
+        public Action OnFirstPage;
+        public Action OnLastPage;
+        public Action OnPageChanged;
         private TabControl _tabControl;
         private Dictionary<int, TabPage> _pagesIndexed;
         private bool isLastPage = false;
@@ -11,19 +12,22 @@
         private int currentIndex;
         public int CurrentIndex
         {
-            get {
-                if (_tabControl.TabPages.Count>1)
+            get
+            {
+                if (_tabControl.TabPages.Count > 1)
                 {
                     var currentTab = _tabControl.SelectedTab;
-                    return _pagesIndexed.First(t=>t.Value == currentTab).Key;
+                    return _pagesIndexed.First(t => t.Value == currentTab).Key;
                 }
-               return currentIndex;
-            } set
+                return currentIndex;
+            }
+            set
             {
                 if (value == 0)
                 {
                     IsFirstPage = true;
-                } else if (value == _pagesIndexed.Count-1)
+                }
+                else if (value == _pagesIndexed.Count - 1)
                 {
                     IsLastPage = true;
                 }
@@ -34,15 +38,16 @@
                 }
                 currentIndex = value;
             }
-        }
+        } 
 
         public bool IsLastPage { get => isLastPage; set 
             { 
                 isLastPage = value;
                 if (value == true)
                 {
-                    OnLastPage.Invoke();
+                    OnLastPage?.Invoke();
                 }
+                
             } 
         }
 
@@ -51,7 +56,7 @@
                 isFirstPage = value;
                 if (value == true)
                 {
-                    OnFirstPage.Invoke();
+                    OnFirstPage?.Invoke();
                 }
             }
         }
@@ -68,6 +73,7 @@
         }
         public void ShowNextOne()
         {
+            OnPageChanged.Invoke();
             if (_tabControl.TabPages.Count != 0)
             {
                 CurrentIndex += 1;
@@ -80,6 +86,7 @@
 
         public void ShowPrevOne()
         {
+            OnPageChanged.Invoke();
             CurrentIndex -= 1;
             HideAllPages();
             ShowPage(CurrentIndex);

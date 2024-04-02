@@ -26,7 +26,7 @@ namespace NewGraverForms_Net
         public MainForm(IBaseMarkerService service, IConfiguration cfg)
         {
             InitializeComponent();
-            _tabControlHelper = new TabControlHelper(mainTabControl);
+            _tabControlHelper = InitTabControlHelper(mainTabControl);
             _service = service;
             _configuration = cfg;
             _serialPortSection = _configuration.GetSection("SerialRangeMeter");
@@ -36,6 +36,17 @@ namespace NewGraverForms_Net
             Log.Warning(Properties.Settings.Default.apiKey);
             Log.Warning(_configuration?.GetConnectionString("sql"));
 
+        }
+        private TabControlHelper InitTabControlHelper(TabControl tabControl)
+        {
+            var helper = new TabControlHelper(mainTabControl);
+            helper.OnFirstPage += OnFirstTab;
+            helper.OnLastPage += OnLastTab;
+            helper.OnPageChanged += OnAnotherTab;
+            helper.HideAllPages();
+            helper.ShowPage(0);
+            helper.CurrentIndex = 0;
+            return helper;
         }
 
         private void InitComboBox()
@@ -195,10 +206,34 @@ namespace NewGraverForms_Net
 
         private void buttonNextTab_Click(object sender, EventArgs e)
         {
-            if (_tabControlHelper.IsLastPage)
-            {
+            _tabControlHelper.ShowNextOne();
+        }
+        private void OnFirstTab()
+        {
+            buttonBackTab.Hide();
+        }
+        private void OnLastTab()
+        {
+            buttonNextTab.Hide();
+        }
+        private void OnAnotherTab()
+        {
+            buttonBackTab.Show();
+            buttonNextTab.Show();
+        }
 
+        private void buttonBackTab_Click(object sender, EventArgs e)
+        {
+            _tabControlHelper.ShowPrevOne();
+        }
+
+        private void buttonAcceptHeight_Click(object sender, EventArgs e)
+        {
+            if (string.Compare(textBoxHeight.Text,"",ignoreCase: true,culture: CultureInfo.InvariantCulture)==0)
+            {
+                return;
             }
+            _service.SetHeightToObject(int.Parse(textBoxHeight.Text));
         }
     }
 }
