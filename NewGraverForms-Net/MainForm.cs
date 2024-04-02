@@ -2,6 +2,7 @@
 using GraverLibrary.Services.Common;
 using Microsoft.Extensions.Configuration;
 using NewGraverForms_Net.Exceptions.Serial;
+using NewGraverForms_Net.Tools;
 using Serilog;
 using System.Configuration;
 using System.Diagnostics;
@@ -14,9 +15,10 @@ namespace NewGraverForms_Net
 {
     public partial class MainForm : Form
     {
-        private const int ELEMENTS_FROM_SERIAL = 3;
+        private SerialPort _serialRangeMeter;
 
-        private static SerialPort SerialRangeMeter { get; set; }
+        private const int ELEMENTS_FROM_SERIAL = 3;
+        private readonly TabControlHelper _tabControlHelper;
         private readonly IBaseMarkerService _service;
         private readonly IConfiguration _configuration;
         private readonly IConfigurationSection _serialPortSection;
@@ -24,6 +26,7 @@ namespace NewGraverForms_Net
         public MainForm(IBaseMarkerService service, IConfiguration cfg)
         {
             InitializeComponent();
+            _tabControlHelper = new TabControlHelper(mainTabControl);
             _service = service;
             _configuration = cfg;
             _serialPortSection = _configuration.GetSection("SerialRangeMeter");
@@ -68,9 +71,9 @@ namespace NewGraverForms_Net
 
         private void button_set_auto_height_Click(object sender, EventArgs e)
         {
-            SerialRangeMeter.Open();
+            _serialRangeMeter.Open();
             int height = GetHeightToObj();
-            SerialRangeMeter.Close();
+            _serialRangeMeter.Close();
             labelAutoHeight.Text = height.ToString() + " mm";
             //_service.SetHeightToObject(height);
         }
@@ -83,7 +86,7 @@ namespace NewGraverForms_Net
                 int i = 0;
                 while (i < ELEMENTS_FROM_SERIAL)
                 {
-                    rangesToObj[i] = SerialRangeMeter.ReadLine();
+                    rangesToObj[i] = _serialRangeMeter.ReadLine();
                     i++;
                 }
                 ValidateHeightsFromSerial(rangesToObj);
@@ -125,7 +128,7 @@ namespace NewGraverForms_Net
                 throw new ConfigurationErrorsException("Check the SerialRangeMeter section of appSettings.json file!" +
                     "\r\n The baudRate cannot be 0 and name cannot be null");
             }
-            SerialRangeMeter = new SerialPort(portName: portName, baudRate: baudRate);
+            _serialRangeMeter = new SerialPort(portName: portName, baudRate: baudRate);
         }
 
         private void buttonConnection_Click(object sender, EventArgs e)
@@ -187,6 +190,14 @@ namespace NewGraverForms_Net
             if (int.Parse(((TextBox)portTextBox).Text) > MAX_PORT)
             {
                 e.Handled = true;
+            }
+        }
+
+        private void buttonNextTab_Click(object sender, EventArgs e)
+        {
+            if (_tabControlHelper.IsLastPage)
+            {
+
             }
         }
     }

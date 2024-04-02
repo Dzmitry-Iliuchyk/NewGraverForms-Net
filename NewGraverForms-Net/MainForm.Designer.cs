@@ -46,25 +46,27 @@
             labelZshift = new Label();
             comboBoxMaterial = new ComboBox();
             labelMaterial = new Label();
-            button4 = new Button();
-            label2 = new Label();
-            button3 = new Button();
-            button2 = new Button();
-            label1 = new Label();
+            buttonManualStart = new Button();
+            labelManualMode = new Label();
+            buttonAutoStop = new Button();
+            buttonAutoStart = new Button();
+            labelAutoMode = new Label();
             buttonAcceptMaterial = new Button();
-            tabControl1 = new TabControl();
+            mainTabControl = new TabControl();
             tabPageConnection = new TabPage();
             tabPageFileChoice = new TabPage();
             tabPageAxesXY = new TabPage();
             tabPageHeight = new TabPage();
-            this.tabPageMaterial = new TabPage();
+            tabPageMaterial = new TabPage();
             tabPageStart = new TabPage();
-            tabControl1.SuspendLayout();
+            buttonNextTab = new Button();
+            buttonBackTab = new Button();
+            mainTabControl.SuspendLayout();
             tabPageConnection.SuspendLayout();
             tabPageFileChoice.SuspendLayout();
             tabPageAxesXY.SuspendLayout();
             tabPageHeight.SuspendLayout();
-            this.tabPageMaterial.SuspendLayout();
+            tabPageMaterial.SuspendLayout();
             tabPageStart.SuspendLayout();
             SuspendLayout();
             // 
@@ -260,64 +262,64 @@
             labelMaterial.TabIndex = 0;
             labelMaterial.Text = "Материал";
             // 
-            // button4
+            // buttonManualStart
             // 
-            button4.BackColor = Color.Green;
-            button4.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button4.ForeColor = Color.White;
-            button4.Location = new Point(6, 91);
-            button4.Margin = new Padding(3, 4, 3, 4);
-            button4.Name = "button4";
-            button4.Size = new Size(126, 75);
-            button4.TabIndex = 4;
-            button4.Text = "Старт";
-            button4.UseVisualStyleBackColor = false;
+            buttonManualStart.BackColor = Color.Green;
+            buttonManualStart.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            buttonManualStart.ForeColor = Color.White;
+            buttonManualStart.Location = new Point(6, 91);
+            buttonManualStart.Margin = new Padding(3, 4, 3, 4);
+            buttonManualStart.Name = "buttonManualStart";
+            buttonManualStart.Size = new Size(126, 75);
+            buttonManualStart.TabIndex = 4;
+            buttonManualStart.Text = "Старт";
+            buttonManualStart.UseVisualStyleBackColor = false;
             // 
-            // label2
+            // labelManualMode
             // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            label2.Location = new Point(6, 47);
-            label2.Name = "label2";
-            label2.Size = new Size(148, 28);
-            label2.TabIndex = 1;
-            label2.Text = "Ручной режим";
+            labelManualMode.AutoSize = true;
+            labelManualMode.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            labelManualMode.Location = new Point(6, 47);
+            labelManualMode.Name = "labelManualMode";
+            labelManualMode.Size = new Size(148, 28);
+            labelManualMode.TabIndex = 1;
+            labelManualMode.Text = "Ручной режим";
             // 
-            // button3
+            // buttonAutoStop
             // 
-            button3.BackColor = Color.Red;
-            button3.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button3.ForeColor = Color.White;
-            button3.Location = new Point(291, 91);
-            button3.Margin = new Padding(3, 4, 3, 4);
-            button3.Name = "button3";
-            button3.Size = new Size(126, 75);
-            button3.TabIndex = 4;
-            button3.Text = "Стоп";
-            button3.UseVisualStyleBackColor = false;
+            buttonAutoStop.BackColor = Color.Red;
+            buttonAutoStop.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            buttonAutoStop.ForeColor = Color.White;
+            buttonAutoStop.Location = new Point(291, 91);
+            buttonAutoStop.Margin = new Padding(3, 4, 3, 4);
+            buttonAutoStop.Name = "buttonAutoStop";
+            buttonAutoStop.Size = new Size(126, 75);
+            buttonAutoStop.TabIndex = 4;
+            buttonAutoStop.Text = "Стоп";
+            buttonAutoStop.UseVisualStyleBackColor = false;
             // 
-            // button2
+            // buttonAutoStart
             // 
-            button2.BackColor = Color.Green;
-            button2.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button2.ForeColor = Color.White;
-            button2.Location = new Point(135, 91);
-            button2.Margin = new Padding(3, 4, 3, 4);
-            button2.Name = "button2";
-            button2.Size = new Size(126, 75);
-            button2.TabIndex = 3;
-            button2.Text = "Старт";
-            button2.UseVisualStyleBackColor = false;
+            buttonAutoStart.BackColor = Color.Green;
+            buttonAutoStart.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            buttonAutoStart.ForeColor = Color.White;
+            buttonAutoStart.Location = new Point(135, 91);
+            buttonAutoStart.Margin = new Padding(3, 4, 3, 4);
+            buttonAutoStart.Name = "buttonAutoStart";
+            buttonAutoStart.Size = new Size(126, 75);
+            buttonAutoStart.TabIndex = 3;
+            buttonAutoStart.Text = "Старт";
+            buttonAutoStart.UseVisualStyleBackColor = false;
             // 
-            // label1
+            // labelAutoMode
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            label1.Location = new Point(160, 47);
-            label1.Name = "label1";
-            label1.Size = new Size(232, 28);
-            label1.TabIndex = 0;
-            label1.Text = "Автоматический режим";
+            labelAutoMode.AutoSize = true;
+            labelAutoMode.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            labelAutoMode.Location = new Point(160, 47);
+            labelAutoMode.Name = "labelAutoMode";
+            labelAutoMode.Size = new Size(232, 28);
+            labelAutoMode.TabIndex = 0;
+            labelAutoMode.Text = "Автоматический режим";
             // 
             // buttonAcceptMaterial
             // 
@@ -328,19 +330,19 @@
             buttonAcceptMaterial.Text = "Применить";
             buttonAcceptMaterial.UseVisualStyleBackColor = true;
             // 
-            // tabControl1
+            // mainTabControl
             // 
-            tabControl1.Controls.Add(tabPageConnection);
-            tabControl1.Controls.Add(tabPageFileChoice);
-            tabControl1.Controls.Add(tabPageAxesXY);
-            tabControl1.Controls.Add(tabPageHeight);
-            tabControl1.Controls.Add(this.tabPageMaterial);
-            tabControl1.Controls.Add(tabPageStart);
-            tabControl1.Location = new Point(1, 3);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(436, 279);
-            tabControl1.TabIndex = 14;
+            mainTabControl.Controls.Add(tabPageConnection);
+            mainTabControl.Controls.Add(tabPageFileChoice);
+            mainTabControl.Controls.Add(tabPageAxesXY);
+            mainTabControl.Controls.Add(tabPageHeight);
+            mainTabControl.Controls.Add(tabPageMaterial);
+            mainTabControl.Controls.Add(tabPageStart);
+            mainTabControl.Location = new Point(1, 3);
+            mainTabControl.Name = "mainTabControl";
+            mainTabControl.SelectedIndex = 0;
+            mainTabControl.Size = new Size(537, 313);
+            mainTabControl.TabIndex = 14;
             // 
             // tabPageConnection
             // 
@@ -352,7 +354,7 @@
             tabPageConnection.Location = new Point(4, 29);
             tabPageConnection.Name = "tabPageConnection";
             tabPageConnection.Padding = new Padding(3);
-            tabPageConnection.Size = new Size(428, 246);
+            tabPageConnection.Size = new Size(529, 280);
             tabPageConnection.TabIndex = 0;
             tabPageConnection.Text = "Connection";
             tabPageConnection.UseVisualStyleBackColor = true;
@@ -365,7 +367,7 @@
             tabPageFileChoice.Location = new Point(4, 29);
             tabPageFileChoice.Name = "tabPageFileChoice";
             tabPageFileChoice.Padding = new Padding(3);
-            tabPageFileChoice.Size = new Size(428, 246);
+            tabPageFileChoice.Size = new Size(529, 280);
             tabPageFileChoice.TabIndex = 1;
             tabPageFileChoice.Text = "ChoiceFile";
             tabPageFileChoice.UseVisualStyleBackColor = true;
@@ -377,7 +379,7 @@
             tabPageAxesXY.Location = new Point(4, 29);
             tabPageAxesXY.Name = "tabPageAxesXY";
             tabPageAxesXY.Padding = new Padding(3);
-            tabPageAxesXY.Size = new Size(428, 246);
+            tabPageAxesXY.Size = new Size(529, 280);
             tabPageAxesXY.TabIndex = 2;
             tabPageAxesXY.Text = "Axes XY";
             tabPageAxesXY.UseVisualStyleBackColor = true;
@@ -393,50 +395,71 @@
             tabPageHeight.Location = new Point(4, 29);
             tabPageHeight.Name = "tabPageHeight";
             tabPageHeight.Padding = new Padding(3);
-            tabPageHeight.Size = new Size(428, 246);
+            tabPageHeight.Size = new Size(529, 280);
             tabPageHeight.TabIndex = 3;
             tabPageHeight.Text = "Height";
             tabPageHeight.UseVisualStyleBackColor = true;
             // 
             // tabPageMaterial
             // 
-            this.tabPageMaterial.Controls.Add(buttonAcceptMaterial);
-            this.tabPageMaterial.Controls.Add(labelMaterial);
-            this.tabPageMaterial.Controls.Add(comboBoxMaterial);
-            this.tabPageMaterial.Location = new Point(4, 29);
-            this.tabPageMaterial.Name = "tabPageMaterial";
-            this.tabPageMaterial.Padding = new Padding(3);
-            this.tabPageMaterial.Size = new Size(428, 246);
-            this.tabPageMaterial.TabIndex = 4;
-            this.tabPageMaterial.Text = "Material";
-            this.tabPageMaterial.UseVisualStyleBackColor = true;
+            tabPageMaterial.Controls.Add(buttonAcceptMaterial);
+            tabPageMaterial.Controls.Add(labelMaterial);
+            tabPageMaterial.Controls.Add(comboBoxMaterial);
+            tabPageMaterial.Location = new Point(4, 29);
+            tabPageMaterial.Name = "tabPageMaterial";
+            tabPageMaterial.Padding = new Padding(3);
+            tabPageMaterial.Size = new Size(529, 280);
+            tabPageMaterial.TabIndex = 4;
+            tabPageMaterial.Text = "Material";
+            tabPageMaterial.UseVisualStyleBackColor = true;
             // 
             // tabPageStart
             // 
             tabPageStart.BorderStyle = BorderStyle.FixedSingle;
-            tabPageStart.Controls.Add(button3);
-            tabPageStart.Controls.Add(button4);
-            tabPageStart.Controls.Add(button2);
-            tabPageStart.Controls.Add(label2);
-            tabPageStart.Controls.Add(label1);
+            tabPageStart.Controls.Add(buttonAutoStop);
+            tabPageStart.Controls.Add(buttonManualStart);
+            tabPageStart.Controls.Add(buttonAutoStart);
+            tabPageStart.Controls.Add(labelManualMode);
+            tabPageStart.Controls.Add(labelAutoMode);
             tabPageStart.Location = new Point(4, 29);
             tabPageStart.Name = "tabPageStart";
             tabPageStart.Padding = new Padding(3);
-            tabPageStart.Size = new Size(428, 246);
+            tabPageStart.Size = new Size(529, 280);
             tabPageStart.TabIndex = 5;
             tabPageStart.Text = "Start";
             tabPageStart.UseVisualStyleBackColor = true;
+            // 
+            // buttonNextTab
+            // 
+            buttonNextTab.Location = new Point(418, 338);
+            buttonNextTab.Name = "buttonNextTab";
+            buttonNextTab.Size = new Size(94, 29);
+            buttonNextTab.TabIndex = 15;
+            buttonNextTab.Text = "Next";
+            buttonNextTab.UseVisualStyleBackColor = true;
+            buttonNextTab.Click += buttonNextTab_Click;
+            // 
+            // buttonBackTab
+            // 
+            buttonBackTab.Location = new Point(35, 338);
+            buttonBackTab.Name = "buttonBackTab";
+            buttonBackTab.Size = new Size(94, 29);
+            buttonBackTab.TabIndex = 16;
+            buttonBackTab.Text = "Back";
+            buttonBackTab.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(540, 388);
-            Controls.Add(tabControl1);
+            ClientSize = new Size(540, 379);
+            Controls.Add(buttonBackTab);
+            Controls.Add(buttonNextTab);
+            Controls.Add(mainTabControl);
             Margin = new Padding(5, 4, 5, 4);
             Name = "MainForm";
             Text = "Form1";
-            tabControl1.ResumeLayout(false);
+            mainTabControl.ResumeLayout(false);
             tabPageConnection.ResumeLayout(false);
             tabPageConnection.PerformLayout();
             tabPageFileChoice.ResumeLayout(false);
@@ -445,8 +468,8 @@
             tabPageAxesXY.PerformLayout();
             tabPageHeight.ResumeLayout(false);
             tabPageHeight.PerformLayout();
-            this.tabPageMaterial.ResumeLayout(false);
-            this.tabPageMaterial.PerformLayout();
+            tabPageMaterial.ResumeLayout(false);
+            tabPageMaterial.PerformLayout();
             tabPageStart.ResumeLayout(false);
             tabPageStart.PerformLayout();
             ResumeLayout(false);
@@ -473,21 +496,23 @@
         private Label labelMaterial;
         private Label labelAutoHeight;
         private SplitContainer splitContainerStartMarking;
-        private Label label2;
-        private Label label1;
-        private Button button4;
-        private Button button3;
-        private Button button2;
+        private Label labelManualMode;
+        private Label labelAutoMode;
+        private Button buttonManualStart;
+        private Button buttonAutoStop;
+        private Button buttonAutoStart;
         private TextBox textBoxConnectionPort;
         private TextBox textBoxConnectionHost;
         private Button buttonAcceptMaterial;
-        private TabControl tabControl1;
+        private TabControl mainTabControl;
         private TabPage tabPageConnection;
         private TabPage tabPageFileChoice;
         private TabPage tabPageAxesXY;
         private TabPage tabPageHeight;
-        private TabPage tabPage2;
+        private TabPage tabPageMaterial;
         private TabPage tabPageStart;
+        private Button buttonNextTab;
+        private Button buttonBackTab;
     }
 }
 
