@@ -1,7 +1,10 @@
 ﻿using GraverLibrary.Models;
+using GraverLibrary.Models.Common;
 using GraverLibrary.Services.Common;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using NewGraverForms_Net.Exceptions.Serial;
+using NewGraverForms_Net.Services.Common;
 using NewGraverForms_Net.Tools;
 using Serilog;
 using System.Configuration;
@@ -15,28 +18,57 @@ namespace NewGraverForms_Net
 {
     public partial class MainForm : Form
     {
-        private SerialPort _serialRangeMeter;
 
-        private const int ELEMENTS_FROM_SERIAL = 3;
+        private const int MAX_PORT = 65535;
+        private const int COUNT_IPV4_BLOCKS = 4;
         private readonly TabControlHelper _tabControlHelper;
-        private readonly IBaseMarkerService _service;
+        private readonly IBaseMarkerService _graverService;
+        private readonly IHeightService _heightService;
+        private readonly ILogger<MainForm> _logger;
         private readonly IConfiguration _configuration;
         private readonly IConfigurationSection _serialPortSection;
         private readonly IConfigurationSection _materialsSection;
-        public MainForm(IBaseMarkerService service, IConfiguration cfg)
+
+        public MainForm(
+            IBaseMarkerService graverService,
+            IConfiguration cfg,
+            ILogger<MainForm> logger,
+            IHeightService heightService
+            )
         {
             InitializeComponent();
             _tabControlHelper = InitTabControlHelper(mainTabControl);
-            _service = service;
+            _heightService = heightService;
+            _graverService = graverService;
+            _logger = logger;
             _configuration = cfg;
             _serialPortSection = _configuration.GetSection("SerialRangeMeter");
             _materialsSection = _configuration.GetSection("MaterialConfiguration");
-            InitArduino();
+            InitButtons();
+            InitActions();
             InitComboBox();
-            Log.Warning(Properties.Settings.Default.apiKey);
-            Log.Warning(_configuration?.GetConnectionString("sql"));
+            _logger.LogWarning(Properties.Settings.Default.apiKey);
+            _logger.LogWarning(_configuration?.GetConnectionString("sql"));
 
         }
+
+        private void InitActions()
+        {
+            _graverService.Connected += OnConnected;
+        }
+
+        private void OnConnected()
+        {
+            labelIsConnected.Text = "Success";
+            labelIsConnected.ForeColor = Color.Green;
+            buttonNextTab.Enabled = true;
+        }
+
+        private void InitButtons()
+        {
+            buttonNextTab.Enabled = false;
+        }
+
         private TabControlHelper InitTabControlHelper(TabControl tabControl)
         {
             var helper = new TabControlHelper(mainTabControl);
@@ -51,6 +83,7 @@ namespace NewGraverForms_Net
 
         private void InitComboBox()
         {
+            _logger.LogInformation(nameof(InitComboBox) + DateTime.Now);
             var materialArray = _materialsSection.GetSection("Material").Get<Material[]>();
             comboBoxMaterial.Items.AddRange(materialArray);
             comboBoxMaterial.DisplayMember = nameof(Material.Name);
@@ -58,7 +91,7 @@ namespace NewGraverForms_Net
 
         private void buttonAxisControl_Click(object sender, EventArgs e)
         {
-            FormAxis form = new FormAxis(_service);
+            FormAxis form = new FormAxis(_graverService);
             form.Owner = this;
             form.Show();
         }
@@ -70,82 +103,34 @@ namespace NewGraverForms_Net
             openFileDialog.Filter = "le|*.le";
             if (openFileDialog.ShowDialog() != DialogResult.OK)
             {
-                Log.Warning("Выбор файла отменён");
+                _logger.LogWarning("Выбор файла отменён");
                 return;
             }
             var pathLeFile = openFileDialog.FileName;
-            Log.Information("Выбранный файл: " + pathLeFile);
+            _logger.LogInformation("Выбранный файл: " + pathLeFile);
 
-            _service.SendFile(new FileStream(pathLeFile, FileMode.Open));
+            _graverService.SendFile(new FileStream(pathLeFile, FileMode.Open));
 
         }
 
         private void button_set_auto_height_Click(object sender, EventArgs e)
         {
-            _serialRangeMeter.Open();
-            int height = GetHeightToObj();
-            _serialRangeMeter.Close();
+            int height = _heightService.GetHeightToObj();
             labelAutoHeight.Text = height.ToString() + " mm";
             //_service.SetHeightToObject(height);
         }
 
-        private int GetHeightToObj()
+        private async void buttonConnection_Click(object sender, EventArgs e)
         {
-            int result = 0;
+            if (textBoxConnectionHost.Text.Split('.').Length == COUNT_IPV4_BLOCKS)
             {
-                string[] rangesToObj = new string[ELEMENTS_FROM_SERIAL];
-                int i = 0;
-                while (i < ELEMENTS_FROM_SERIAL)
-                {
-                    rangesToObj[i] = _serialRangeMeter.ReadLine();
-                    i++;
-                }
-                ValidateHeightsFromSerial(rangesToObj);
-                int[] heights = new int[ELEMENTS_FROM_SERIAL];
-                for (int j = 0; j < rangesToObj.Length; j++)
-                {
-                    string range = rangesToObj[j];
-                    heights[j] = Convert.ToInt32(range);
-                }
-                result = (int)Math.Round(((double)heights.Sum() / ELEMENTS_FROM_SERIAL));
+                return;
             }
-            return result;
-        }
-        private void ValidateHeightsFromSerial(string[] heights)
-        {
-            foreach (string height in heights)
+            if (!int.TryParse(textBoxConnectionPort.Text, out int port)||port<1||port>MAX_PORT)
             {
-                if (height.Contains("out of range"))
-                {
-                    throw new HeightOutOfRangeException("Object is out of range");
-                }
-                if (height.Contains("Failed to boot VL53L0X"))
-                {
-                    throw new SensorUnavailableException("Failed to boot VL53L0X");
-                }
+                return;
             }
-        }
-
-        private void InitArduino()
-        {
-            if (_serialPortSection == null)
-            {
-                throw new ConfigurationErrorsException("You should fill the SerialRangeMeter section of appSettings.json file!");
-            }
-            string portName = _serialPortSection.GetValue<string>("portName");
-            int baudRate = _serialPortSection.GetValue<int>("baudRate");
-            if (portName == null || baudRate == 0)
-            {
-                throw new ConfigurationErrorsException("Check the SerialRangeMeter section of appSettings.json file!" +
-                    "\r\n The baudRate cannot be 0 and name cannot be null");
-            }
-            _serialRangeMeter = new SerialPort(portName: portName, baudRate: baudRate);
-        }
-
-        private void buttonConnection_Click(object sender, EventArgs e)
-        {
-            Debug.WriteLine(IPAddress.Parse(textBoxConnectionHost.Text));
-            Debug.WriteLine(textBoxConnectionPort.Text, CultureInfo.InvariantCulture);
+            await _graverService.TryConnectAsync(IPAddress.Parse(textBoxConnectionHost.Text),port);
         }
 
         private void textBoxHeight_KeyPress(object sender, KeyPressEventArgs e)
@@ -168,7 +153,7 @@ namespace NewGraverForms_Net
                 return;
             }
             var blocks = ((TextBox)IpAddressTextBox).Text.Split('.');
-            const int COUNT_IPV4_BLOCKS = 4;
+            
             if (blocks.Length == COUNT_IPV4_BLOCKS)
             {
                 if (int.Parse(blocks[COUNT_IPV4_BLOCKS - 1] + e.KeyChar) >= 255)
@@ -197,7 +182,7 @@ namespace NewGraverForms_Net
                 e.Handled = true;
             }
 
-            const int MAX_PORT = 65535;
+            
             if (int.Parse(((TextBox)portTextBox).Text) > MAX_PORT)
             {
                 e.Handled = true;
@@ -207,6 +192,7 @@ namespace NewGraverForms_Net
         private void buttonNextTab_Click(object sender, EventArgs e)
         {
             _tabControlHelper.ShowNextOne();
+            buttonNextTab.Enabled = false;
         }
         private void OnFirstTab()
         {
@@ -233,7 +219,7 @@ namespace NewGraverForms_Net
             {
                 return;
             }
-            _service.SetHeightToObject(int.Parse(textBoxHeight.Text));
+            _graverService.SetHeightToObject(int.Parse(textBoxHeight.Text));
         }
     }
 }

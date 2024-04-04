@@ -26,8 +26,8 @@ namespace NewGraverForms_Net
             this.service = service;
             textBox_X_Coord.Text = service.GetCoordinateX();
             textBox_Y_Coord.Text = service.GetCoordinateY();
-            X_Coord_Label.Text = textBox_X_Coord.Text;
-            Y_Coord_Label.Text = textBox_Y_Coord.Text;
+            X_Coord_Label_Value.Text = textBox_X_Coord.Text;
+            Y_Coord_Label_Value.Text = textBox_Y_Coord.Text;
         }
 
         private void AcceptXY_Button_Click(object sender, EventArgs e)
@@ -36,8 +36,8 @@ namespace NewGraverForms_Net
             {
                 service.MoveToCoordinateByX(float.Parse(textBox_X_Coord.Text));
                 service.MoveToCoordinateByY(float.Parse(textBox_Y_Coord.Text));
-                X_Coord_Label.Text = textBox_X_Coord.Text;
-                Y_Coord_Label.Text = textBox_Y_Coord.Text;
+                X_Coord_Label_Value.Text = textBox_X_Coord.Text;
+                Y_Coord_Label_Value.Text = textBox_Y_Coord.Text;
             }
             catch (Exception ex)
             {
@@ -48,35 +48,35 @@ namespace NewGraverForms_Net
 
         private void buttonDown_Click(object sender, EventArgs e)
         {
-            int newCoordY = int.Parse(Y_Coord_Label.Text) - 1;
+            int newCoordY = int.Parse(Y_Coord_Label_Value.Text) - 1;
             service.MoveToCoordinateByY(newCoordY);
-            Y_Coord_Label.Text = newCoordY.ToString();
+            Y_Coord_Label_Value.Text = newCoordY.ToString();
             //Log.Information("Сдвиг по оси Y вниз");
 
         }
 
         private void buttonLeft_Click(object sender, EventArgs e)
         {
-            int newCoordX = int.Parse(X_Coord_Label.Text) - 1;
+            int newCoordX = int.Parse(X_Coord_Label_Value.Text) - 1;
             service.MoveToCoordinateByX(newCoordX);
-            X_Coord_Label.Text = newCoordX.ToString();
+            X_Coord_Label_Value.Text = newCoordX.ToString();
             //Log.Information("Сдвиг по оси X влево");
 
         }
 
         private void buttonRight_Click(object sender, EventArgs e)
         {
-            int newCoordX = int.Parse(X_Coord_Label.Text) + 1;
+            int newCoordX = int.Parse(X_Coord_Label_Value.Text) + 1;
             service.MoveToCoordinateByX(newCoordX);
-            X_Coord_Label.Text = newCoordX.ToString();
+            X_Coord_Label_Value.Text = newCoordX.ToString();
             //Log.Information("Сдвиг по оси X вправо");
         }
 
         private void buttonUp_Click(object sender, EventArgs e)
         {
-            int newCoordY = int.Parse(Y_Coord_Label.Text) + 1;
+            int newCoordY = int.Parse(Y_Coord_Label_Value.Text) + 1;
             service.MoveToCoordinateByY(newCoordY);
-            Y_Coord_Label.Text = newCoordY.ToString();
+            Y_Coord_Label_Value.Text = newCoordY.ToString();
             //Log.Information("Сдвиг по оси Y вверх");
         }
 

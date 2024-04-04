@@ -5,7 +5,10 @@ using GraverLibrary.Services.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NewGraverForms_Net.Logger;
+using Microsoft.Extensions.Logging;
+using NewGraverForms_Net.Models;
+using NewGraverForms_Net.Services.Common;
+using NewGraverForms_Net.Services.Implementations;
 using Serilog;
 using System.Text;
 using System.Text.Unicode;
@@ -22,7 +25,6 @@ namespace NewGraverForms_Net
         [STAThread]
         private static void Main()
         { 
-            Logging.ConfigureLogger();
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
             // Add the event handler for handling non-UI thread exceptions to the event.
@@ -31,7 +33,6 @@ namespace NewGraverForms_Net
             var host = CreateHostBuilder().Build();
 
             ServiceProvider = host.Services;
-
             Application.Run(ServiceProvider.GetRequiredService<MainForm>());
         }
 
@@ -43,23 +44,47 @@ namespace NewGraverForms_Net
             return Host.CreateDefaultBuilder().ConfigureHostConfiguration(a => a.AddJsonFile("appSettings.json", optional: false, reloadOnChange: true))
                 .ConfigureServices((context, services) =>
                 {
+                    services.AddLogging(builder=>
+                    {
+                        builder.ClearProviders();
+                        string path = Application.StartupPath + "\\MaxiGrafLog.txt";
+                        FileInfo fileInfo = new FileInfo(path);
+                        if (!fileInfo.Exists)
+                        {
+                            fileInfo.Create();
+                        }
+                        var logger = new LoggerConfiguration()
+                            .MinimumLevel.Information()
+                            .WriteTo.Console()
+                            .WriteTo.File(path)
+                            .CreateLogger();
 
+                        builder.AddSerilog(logger);
+                    });
                     services.AddSingleton<MainForm>();
                     services.AddSingleton(new MaxiGrafConfig(
-                        context.Configuration.GetSection("GraverConfig").GetValue<string>("ApiKey"),
-                        context.Configuration.GetSection("GraverConfig").GetValue<float>("FocusHeight")));
-                    services.AddSingleton<ConnectionConfig>();
+                        context.Configuration.GetSection(nameof(ConfigSectionsEnum.GraverConfig))
+                        .GetValue<string>(nameof(IGraverConfig.ApiKey)),
+                        context.Configuration.GetSection(nameof(ConfigSectionsEnum.GraverConfig))
+                        .GetValue<float>(nameof(IGraverConfig.FocusHeight))));
+                    services.AddSingleton<SerialConfig>(new SerialConfig(
+                        context.Configuration.GetSection(nameof(ConfigSectionsEnum.SerialRangeMeter))
+                        .GetValue<string>(nameof(SerialConfig.PortName)),
+                        context.Configuration.GetSection(nameof(ConfigSectionsEnum.SerialRangeMeter))
+                        .GetValue<int>(nameof(SerialConfig.BaudRate))));
+                    services.AddSingleton<IHeightService, HeightService>();
                     services.AddSingleton<MarkInfo>();
                     services.AddSingleton<IBaseMarkerService, MaxiGrafService>();
                 });
         }
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            var logger = ServiceProvider.GetRequiredService<Serilog.ILogger>();
             try
             {
                 Exception ex = (Exception)e.ExceptionObject;
 
-                Log.Error("Unhandled exception message: \r\n" + ex.Message + "\r\n StackTrace:\r\n" + ex.StackTrace);
+                logger.Error("Unhandled exception message: \r\n" + ex.Message + "\r\n StackTrace:\r\n" + ex.StackTrace);
                 MessageBox.Show("The program will be closed!\r\n"+ex.ToString(), "Something went wrong!", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
@@ -67,6 +92,7 @@ namespace NewGraverForms_Net
             {
                 try
                 {
+                    logger.Error("Unhandled exception \r\n"+exc.Message);
                     MessageBox.Show("Fatal Non-UI Error",
                         "Fatal Non-UI Error. Could not write the error to the event log. Reason: "
                         + exc.Message, MessageBoxButtons.OK, MessageBoxIcon.Stop);
