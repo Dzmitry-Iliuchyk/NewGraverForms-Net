@@ -54,14 +54,15 @@
             buttonApplyMaterial = new Button();
             mainTabControl = new TabControl();
             tabPageConnection = new TabPage();
+            labelIsConnected = new Label();
             tabPageFileChoice = new TabPage();
             tabPageAxesXY = new TabPage();
+            checkBoxAxesPosition = new CheckBox();
             tabPageHeight = new TabPage();
             tabPageMaterial = new TabPage();
             tabPageStart = new TabPage();
             buttonNextTab = new Button();
             buttonBackTab = new Button();
-            labelIsConnected = new Label();
             mainTabControl.SuspendLayout();
             tabPageConnection.SuspendLayout();
             tabPageFileChoice.SuspendLayout();
@@ -138,7 +139,7 @@
             // 
             label_selectedFile.AutoSize = true;
             label_selectedFile.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            label_selectedFile.Location = new Point(4, 38);
+            label_selectedFile.Location = new Point(26, 39);
             label_selectedFile.Margin = new Padding(2, 0, 2, 0);
             label_selectedFile.Name = "label_selectedFile";
             label_selectedFile.Size = new Size(98, 20);
@@ -325,6 +326,7 @@
             buttonApplyMaterial.TabIndex = 2;
             buttonApplyMaterial.Text = "Apply";
             buttonApplyMaterial.UseVisualStyleBackColor = true;
+            buttonApplyMaterial.Click += buttonApplyMaterial_Click;
             // 
             // mainTabControl
             // 
@@ -358,6 +360,14 @@
             tabPageConnection.Text = "Connection";
             tabPageConnection.UseVisualStyleBackColor = true;
             // 
+            // labelIsConnected
+            // 
+            labelIsConnected.AutoSize = true;
+            labelIsConnected.Location = new Point(123, 76);
+            labelIsConnected.Name = "labelIsConnected";
+            labelIsConnected.Size = new Size(0, 15);
+            labelIsConnected.TabIndex = 16;
+            // 
             // tabPageFileChoice
             // 
             tabPageFileChoice.Controls.Add(label_selectedFile);
@@ -374,6 +384,7 @@
             // 
             // tabPageAxesXY
             // 
+            tabPageAxesXY.Controls.Add(checkBoxAxesPosition);
             tabPageAxesXY.Controls.Add(labelSetUpSettings);
             tabPageAxesXY.Controls.Add(buttonAxisControl);
             tabPageAxesXY.Location = new Point(4, 24);
@@ -384,6 +395,17 @@
             tabPageAxesXY.TabIndex = 2;
             tabPageAxesXY.Text = "Axes XY";
             tabPageAxesXY.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxAxesPosition
+            // 
+            checkBoxAxesPosition.AutoSize = true;
+            checkBoxAxesPosition.Location = new Point(210, 64);
+            checkBoxAxesPosition.Name = "checkBoxAxesPosition";
+            checkBoxAxesPosition.Size = new Size(149, 19);
+            checkBoxAxesPosition.TabIndex = 8;
+            checkBoxAxesPosition.Text = "I aware of axes position";
+            checkBoxAxesPosition.UseVisualStyleBackColor = true;
+            checkBoxAxesPosition.CheckedChanged += checkBoxAxesPosition_CheckedChanged;
             // 
             // tabPageHeight
             // 
@@ -455,14 +477,6 @@
             buttonBackTab.UseVisualStyleBackColor = true;
             buttonBackTab.Click += buttonBackTab_Click;
             // 
-            // labelIsConnected
-            // 
-            labelIsConnected.AutoSize = true;
-            labelIsConnected.Location = new Point(123, 76);
-            labelIsConnected.Name = "labelIsConnected";
-            labelIsConnected.Size = new Size(0, 15);
-            labelIsConnected.TabIndex = 16;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -529,6 +543,7 @@
         private Button buttonNextTab;
         private Button buttonBackTab;
         private Label labelIsConnected;
+        private CheckBox checkBoxAxesPosition;
     }
 }
 
