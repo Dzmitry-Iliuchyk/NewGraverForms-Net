@@ -47,12 +47,13 @@ namespace NewGraverForms_Net
                     services.AddLogging(builder=>
                     {
                         builder.ClearProviders();
-                        string path = Application.StartupPath + "\\MaxiGrafLog.txt";
-                        FileInfo fileInfo = new FileInfo(path);
-                        if (!fileInfo.Exists)
+                        var path = Path.Combine(Application.StartupPath, "Logs", DateTime.Now.ToShortDateString()+".log");
+                        var directoryPath = Path.GetDirectoryName(path);
+                        if (!Directory.Exists(directoryPath))
                         {
-                            fileInfo.Create();
+                            Directory.CreateDirectory(directoryPath);
                         }
+                        File.Create(path);
                         var logger = new LoggerConfiguration()
                             .MinimumLevel.Information()
                             .WriteTo.Console()
@@ -62,6 +63,7 @@ namespace NewGraverForms_Net
                         builder.AddSerilog(logger);
                     });
                     services.AddSingleton<MainForm>();
+                    services.AddSingleton<FormAxis>();
                     services.AddSingleton(new MaxiGrafConfig(
                         context.Configuration.GetSection(nameof(ConfigSectionsEnum.GraverConfig))
                         .GetValue<string>(nameof(IGraverConfig.ApiKey)),
@@ -74,7 +76,9 @@ namespace NewGraverForms_Net
                         .GetValue<int>(nameof(SerialConfig.BaudRate))));
                     services.AddSingleton<IHeightService, HeightService>();
                     services.AddSingleton<MarkInfo>();
+
                     services.AddSingleton<IBaseMarkerService, MaxiGrafService>();
+                    //services.AddSingleton<IBaseMarkerService, MockGraverService>();
                 });
         }
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

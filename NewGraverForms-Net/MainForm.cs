@@ -2,6 +2,9 @@
 using GraverLibrary.Models.Common;
 using GraverLibrary.Services.Common;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NewGraverForms_Net.Exceptions.Serial;
 using NewGraverForms_Net.Services.Common;
@@ -18,7 +21,7 @@ namespace NewGraverForms_Net
 {
     public partial class MainForm : Form
     {
-
+        static int MarkingCount = 0;
         private const int MAX_PORT = 65535;
         private const int COUNT_IPV4_BLOCKS = 4;
         private readonly TabControlHelper _tabControlHelper;
@@ -28,12 +31,14 @@ namespace NewGraverForms_Net
         private readonly IConfiguration _configuration;
         private readonly IConfigurationSection _serialPortSection;
         private readonly IConfigurationSection _materialsSection;
+        private readonly FormAxis _formAxis;
 
         public MainForm(
             IBaseMarkerService graverService,
             IConfiguration cfg,
             ILogger<MainForm> logger,
-            IHeightService heightService
+            IHeightService heightService,
+            FormAxis formAxis
             )
         {
             InitializeComponent();
@@ -44,19 +49,21 @@ namespace NewGraverForms_Net
             _configuration = cfg;
             _serialPortSection = _configuration.GetSection("SerialRangeMeter");
             _materialsSection = _configuration.GetSection("MaterialConfiguration");
+            _formAxis = formAxis;
             InitButtons();
             InitActions();
             InitComboBoxMaterial();
             _logger.LogWarning(Properties.Settings.Default.apiKey);
             _logger.LogWarning(_configuration?.GetConnectionString("sql"));
-
         }
 
         private void InitActions()
         {
             _graverService.Connected += OnConnected;
             _graverService.ProgressSendFile += OnProgressSendFile;
-
+            _graverService.HeightIsSet += OnHeightSetted;
+            _graverService.markingFinished += OnMarkingFinished;
+            _graverService.PowerModIsSet += OnPowerModeIsSet;
         }
 
         private void InitButtons()
@@ -65,18 +72,33 @@ namespace NewGraverForms_Net
         }
 
         #region ConnectionPage
+
         private async void buttonConnection_Click(object sender, EventArgs e)
         {
-            if (textBoxConnectionHost.Text.Split('.').Length == COUNT_IPV4_BLOCKS)
+            bool isIpValid = true, isHostValid = true;
+            if (textBoxConnectionHost.Text.Split('.').Length < COUNT_IPV4_BLOCKS)
             {
-                return;
+                labelConnectionHost.ForeColor = Color.Red;
+                isIpValid = false;
+            }
+            else
+            {
+                labelConnectionHost.ForeColor = Color.Black;
             }
             if (!int.TryParse(textBoxConnectionPort.Text, out int port) || port < 1 || port > MAX_PORT)
             {
+                labelConnectionPort.ForeColor = Color.Red;
+                isHostValid = false;
+            }
+            else
+            {
+                labelConnectionPort.ForeColor = Color.Black;
+            }
+            if (!isIpValid || !isHostValid)
+            {
                 return;
             }
-
-            // await _graverService.TryConnectAsync(IPAddress.Parse(textBoxConnectionHost.Text), port);
+            await _graverService.TryConnectAsync(IPAddress.Parse(textBoxConnectionHost.Text), port);
         }
 
         private void textBoxConnectionHost_KeyPress(object IpAddressTextBox, KeyPressEventArgs e)
@@ -141,13 +163,14 @@ namespace NewGraverForms_Net
             labelIsConnected.ForeColor = Color.Green;
             buttonNextTab.Enabled = true;
         }
+
         #endregion ConnectionPage
 
         #region ChoiceFile
 
         private async void button_selectFile_Click(object sender, EventArgs e)
         {
-            buttonNextTab.Enabled = false;
+            DisableButtonsWhileLoadFile();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "le|*.le";
             if (openFileDialog.ShowDialog() != DialogResult.OK)
@@ -161,13 +184,26 @@ namespace NewGraverForms_Net
             var result = await _graverService.SendFile(new FileStream(pathLeFile, FileMode.Open));
             if (result)
             {
-                label_selectedFile.Text = _graverService.GetFileName();
+                label_selectedFile.Text = Path.GetFileName(pathLeFile);
                 buttonNextTab.Enabled = true;
             }
             else
             {
                 var mb = MessageBox.Show("The file was not loaded.\r\n Improve your connection and repeat!", "Something went wrong!", MessageBoxButtons.OK);
             }
+            EnableButtonsWhileLoadFile();
+        }
+
+        private void DisableButtonsWhileLoadFile()
+        {
+            buttonNextTab.Enabled = false;
+            buttonBackTab.Enabled = false;
+            button_selectFile.Enabled = false;
+        }
+        private void EnableButtonsWhileLoadFile()
+        {
+            buttonBackTab.Enabled = true;
+            button_selectFile.Enabled = true;
         }
 
         private async void OnProgressSendFile(int percent)
@@ -180,9 +216,7 @@ namespace NewGraverForms_Net
 
         private void buttonAxisControl_Click(object sender, EventArgs e)
         {
-            FormAxis form = new FormAxis(_graverService);
-            form.Owner = this;
-            form.Show();
+            _formAxis.ShowDialog();
         }
 
         private void checkBoxAxesPosition_CheckedChanged(object checkBox, EventArgs e)
@@ -198,7 +232,7 @@ namespace NewGraverForms_Net
         {
             int height = _heightService.GetHeightToObj();
             labelAutoHeight.Text = height.ToString() + " mm";
-            //_service.SetHeightToObject(height);
+            _graverService.SetHeightToObject(height);
         }
 
         private void buttonAcceptHeight_Click(object sender, EventArgs e)
@@ -217,6 +251,16 @@ namespace NewGraverForms_Net
                 e.Handled = true;
             }
         }
+        private void OnHeightSetted()
+        {
+            buttonNextTab.Enabled = true;
+        }
+
+        private void checkBoxHeight_CheckedChanged(object sender, EventArgs e)
+        {
+            buttonNextTab.Enabled = ((CheckBox)sender).Checked;
+        }
+
         #endregion Height Page
 
         #region MaterialPage
@@ -229,10 +273,21 @@ namespace NewGraverForms_Net
             comboBoxMaterial.DisplayMember = nameof(Material.Name);
         }
 
-        private void buttonApplyMaterial_Click(object comboBoxMaterial, EventArgs e)
+        private void buttonApplyMaterial_Click(object btnAdmitMaterial, EventArgs e)
         {
-            var selectedMaterial = ((ComboBox)comboBoxMaterial).SelectedItem as Material;
-            _graverService.SetPowerMode(selectedMaterial);
+            var selectedMaterial = comboBoxMaterial.SelectedItem as Material;
+            var result = _graverService.SetPowerMode(selectedMaterial);
+            MessageBox.Show(result);
+        }
+
+        private void checkBoxMaterial_CheckedChanged(object sender, EventArgs e)
+        {
+            buttonNextTab.Enabled = ((CheckBox)sender).Checked;
+        }
+
+        private void OnPowerModeIsSet()
+        {
+            buttonNextTab.Enabled = true;
         }
         #endregion MaterialPage
 
@@ -276,6 +331,37 @@ namespace NewGraverForms_Net
             _tabControlHelper.ShowPrevOne();
         }
         #endregion PagesControl
+
+        #region StartPage
+        private void buttonManualStart_Click(object sender, EventArgs e)
+        {
+            BlockButtonsForMarkingManual();
+        }
+
+        private void buttonAutoStart_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonAutoStop_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OnMarkingFinished()
+        {
+            MarkingCount++;
+            _logger?.LogInformation(nameof(OnMarkingFinished) + DateTime.Now + "MarkingNum" + MarkingCount);
+        }
+
+        private void BlockButtonsForMarkingManual()
+        {
+            buttonBackTab.Enabled = false;
+            buttonAutoStart.Enabled = false;
+            buttonAutoStop.Enabled = false;
+            buttonManualStart.Enabled = false;
+        }
+        #endregion StartPage
 
         
     }

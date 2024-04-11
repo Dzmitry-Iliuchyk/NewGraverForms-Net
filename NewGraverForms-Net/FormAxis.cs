@@ -13,29 +13,40 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GraverLibrary.Services.Common;
+using Microsoft.Extensions.Logging;
 
 namespace NewGraverForms_Net
 {
     public partial class FormAxis : Form
     {
-        private IBaseMarkerService service;
+        private readonly IBaseMarkerService _service;
+        private readonly ILogger<FormAxis> _logger;
 
-        public FormAxis(IBaseMarkerService service)
+        public FormAxis(IBaseMarkerService service, ILogger<FormAxis> logger = null)
         {
+
             InitializeComponent();
-            this.service = service;
-            textBox_X_Coord.Text = service.GetCoordinateX();
-            textBox_Y_Coord.Text = service.GetCoordinateY();
-            X_Coord_Label_Value.Text = textBox_X_Coord.Text;
-            Y_Coord_Label_Value.Text = textBox_Y_Coord.Text;
+            this._service = service;
+            _logger = logger;
+
+
         }
 
-        private void AcceptXY_Button_Click(object sender, EventArgs e)
+        protected override void OnLoad(EventArgs e)
+        {
+            textBox_X_Coord.Text = _service.GetCoordinateX();
+            textBox_Y_Coord.Text = _service.GetCoordinateY();
+            X_Coord_Label_Value.Text = textBox_X_Coord.Text;
+            Y_Coord_Label_Value.Text = textBox_Y_Coord.Text;
+            base.OnLoad(e);
+        }
+        private async void AcceptXY_Button_Click(object sender, EventArgs e)
         {
             try
             {
-                service.MoveToCoordinateByX(float.Parse(textBox_X_Coord.Text));
-                service.MoveToCoordinateByY(float.Parse(textBox_Y_Coord.Text));
+                _service.MoveToCoordinateByX(float.Parse(textBox_X_Coord.Text));
+                await Task.Delay(100);
+                _service.MoveToCoordinateByY(float.Parse(textBox_Y_Coord.Text));
                 X_Coord_Label_Value.Text = textBox_X_Coord.Text;
                 Y_Coord_Label_Value.Text = textBox_Y_Coord.Text;
             }
@@ -49,7 +60,7 @@ namespace NewGraverForms_Net
         private void buttonDown_Click(object sender, EventArgs e)
         {
             int newCoordY = int.Parse(Y_Coord_Label_Value.Text) - 1;
-            service.MoveToCoordinateByY(newCoordY);
+            _service.MoveToCoordinateByY(newCoordY);
             Y_Coord_Label_Value.Text = newCoordY.ToString();
             //Log.Information("Сдвиг по оси Y вниз");
 
@@ -58,7 +69,7 @@ namespace NewGraverForms_Net
         private void buttonLeft_Click(object sender, EventArgs e)
         {
             int newCoordX = int.Parse(X_Coord_Label_Value.Text) - 1;
-            service.MoveToCoordinateByX(newCoordX);
+            _service.MoveToCoordinateByX(newCoordX);
             X_Coord_Label_Value.Text = newCoordX.ToString();
             //Log.Information("Сдвиг по оси X влево");
 
@@ -67,7 +78,7 @@ namespace NewGraverForms_Net
         private void buttonRight_Click(object sender, EventArgs e)
         {
             int newCoordX = int.Parse(X_Coord_Label_Value.Text) + 1;
-            service.MoveToCoordinateByX(newCoordX);
+            _service.MoveToCoordinateByX(newCoordX);
             X_Coord_Label_Value.Text = newCoordX.ToString();
             //Log.Information("Сдвиг по оси X вправо");
         }
@@ -75,7 +86,7 @@ namespace NewGraverForms_Net
         private void buttonUp_Click(object sender, EventArgs e)
         {
             int newCoordY = int.Parse(Y_Coord_Label_Value.Text) + 1;
-            service.MoveToCoordinateByY(newCoordY);
+            _service.MoveToCoordinateByY(newCoordY);
             Y_Coord_Label_Value.Text = newCoordY.ToString();
             //Log.Information("Сдвиг по оси Y вверх");
         }
@@ -98,6 +109,16 @@ namespace NewGraverForms_Net
                     break;
             }
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void buttonCheckCoord_Click(object sender, EventArgs e)
+        {
+            var X = _service.GetCoordinateX();
+            var Y = _service.GetCoordinateY();
+            X_Coord_Label_Value.ResetText();
+            X_Coord_Label_Value.Text = X.ToString();
+            Y_Coord_Label_Value.ResetText();
+            Y_Coord_Label_Value.Text = Y;
         }
     }
 }

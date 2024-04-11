@@ -44,6 +44,7 @@
             labelAxisX = new Label();
             textBox_X_Coord = new TextBox();
             labelCoordinates = new Label();
+            buttonCheckCoord = new Button();
             groupBoxJoystick.SuspendLayout();
             SuspendLayout();
             // 
@@ -235,11 +236,22 @@
             labelCoordinates.TabIndex = 25;
             labelCoordinates.Text = "Coordinates:";
             // 
+            // buttonCheckCoord
+            // 
+            buttonCheckCoord.Location = new Point(251, 160);
+            buttonCheckCoord.Name = "buttonCheckCoord";
+            buttonCheckCoord.Size = new Size(94, 29);
+            buttonCheckCoord.TabIndex = 26;
+            buttonCheckCoord.Text = "Check";
+            buttonCheckCoord.UseVisualStyleBackColor = true;
+            buttonCheckCoord.Click += buttonCheckCoord_Click;
+            // 
             // FormAxis
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(366, 599);
+            Controls.Add(buttonCheckCoord);
             Controls.Add(labelCoordinates);
             Controls.Add(AcceptXY_Button);
             Controls.Add(labelAxisY);
@@ -273,5 +285,6 @@
         private System.Windows.Forms.Label labelCoordinates;
         private System.Windows.Forms.Label labelJoystickY;
         private System.Windows.Forms.Label labelJoystickX;
+        private Button buttonCheckCoord;
     }
 }

@@ -59,7 +59,9 @@
             tabPageAxesXY = new TabPage();
             checkBoxAxesPosition = new CheckBox();
             tabPageHeight = new TabPage();
+            checkBoxHeight = new CheckBox();
             tabPageMaterial = new TabPage();
+            checkBoxMaterial = new CheckBox();
             tabPageStart = new TabPage();
             buttonNextTab = new Button();
             buttonBackTab = new Button();
@@ -272,6 +274,7 @@
             buttonManualStart.TabIndex = 4;
             buttonManualStart.Text = "Start";
             buttonManualStart.UseVisualStyleBackColor = false;
+            buttonManualStart.Click += buttonManualStart_Click;
             // 
             // labelManualMode
             // 
@@ -294,6 +297,7 @@
             buttonAutoStop.TabIndex = 4;
             buttonAutoStop.Text = "Stop";
             buttonAutoStop.UseVisualStyleBackColor = false;
+            buttonAutoStop.Click += buttonAutoStop_Click;
             // 
             // buttonAutoStart
             // 
@@ -306,6 +310,7 @@
             buttonAutoStart.TabIndex = 3;
             buttonAutoStart.Text = "Start";
             buttonAutoStart.UseVisualStyleBackColor = false;
+            buttonAutoStart.Click += buttonAutoStart_Click;
             // 
             // labelAutoMode
             // 
@@ -399,7 +404,7 @@
             // checkBoxAxesPosition
             // 
             checkBoxAxesPosition.AutoSize = true;
-            checkBoxAxesPosition.Location = new Point(210, 64);
+            checkBoxAxesPosition.Location = new Point(286, 183);
             checkBoxAxesPosition.Name = "checkBoxAxesPosition";
             checkBoxAxesPosition.Size = new Size(149, 19);
             checkBoxAxesPosition.TabIndex = 8;
@@ -409,6 +414,7 @@
             // 
             // tabPageHeight
             // 
+            tabPageHeight.Controls.Add(checkBoxHeight);
             tabPageHeight.Controls.Add(labelAutoHeight);
             tabPageHeight.Controls.Add(labelSetUp);
             tabPageHeight.Controls.Add(buttonAcceptHeight);
@@ -424,8 +430,20 @@
             tabPageHeight.Text = "Height";
             tabPageHeight.UseVisualStyleBackColor = true;
             // 
+            // checkBoxHeight
+            // 
+            checkBoxHeight.AutoSize = true;
+            checkBoxHeight.Location = new Point(281, 183);
+            checkBoxHeight.Name = "checkBoxHeight";
+            checkBoxHeight.Size = new Size(165, 19);
+            checkBoxHeight.TabIndex = 16;
+            checkBoxHeight.Text = "I agree with current height";
+            checkBoxHeight.UseVisualStyleBackColor = true;
+            checkBoxHeight.CheckedChanged += checkBoxHeight_CheckedChanged;
+            // 
             // tabPageMaterial
             // 
+            tabPageMaterial.Controls.Add(checkBoxMaterial);
             tabPageMaterial.Controls.Add(buttonApplyMaterial);
             tabPageMaterial.Controls.Add(labelMaterial);
             tabPageMaterial.Controls.Add(comboBoxMaterial);
@@ -437,6 +455,17 @@
             tabPageMaterial.TabIndex = 4;
             tabPageMaterial.Text = "Material";
             tabPageMaterial.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxMaterial
+            // 
+            checkBoxMaterial.AutoSize = true;
+            checkBoxMaterial.Location = new Point(284, 183);
+            checkBoxMaterial.Name = "checkBoxMaterial";
+            checkBoxMaterial.Size = new Size(171, 19);
+            checkBoxMaterial.TabIndex = 3;
+            checkBoxMaterial.Text = "I agree with current options";
+            checkBoxMaterial.UseVisualStyleBackColor = true;
+            checkBoxMaterial.CheckedChanged += checkBoxMaterial_CheckedChanged;
             // 
             // tabPageStart
             // 
@@ -544,6 +573,8 @@
         private Button buttonBackTab;
         private Label labelIsConnected;
         private CheckBox checkBoxAxesPosition;
+        private CheckBox checkBoxHeight;
+        private CheckBox checkBoxMaterial;
     }
 }
 
