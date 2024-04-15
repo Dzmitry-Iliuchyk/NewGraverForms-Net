@@ -2,18 +2,10 @@
 using GraverLibrary.Models.Common;
 using GraverLibrary.Services.Common;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NewGraverForms_Net.Exceptions.Serial;
 using NewGraverForms_Net.Services.Common;
 using NewGraverForms_Net.Tools;
-using Serilog;
-using System.Configuration;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO.Ports;
 using System.Net;
 using System.Text.Json;
 
@@ -21,6 +13,7 @@ namespace NewGraverForms_Net
 {
     public partial class MainForm : Form
     {
+        private List<Order> orders = new List<Order>();
         static int MarkingCount = 0;
         private const int MAX_PORT = 65535;
         private const int COUNT_IPV4_BLOCKS = 4;
@@ -53,8 +46,6 @@ namespace NewGraverForms_Net
             InitButtons();
             InitActions();
             InitComboBoxMaterial();
-            _logger.LogWarning(Properties.Settings.Default.apiKey);
-            _logger.LogWarning(_configuration?.GetConnectionString("sql"));
         }
 
         private void InitActions()
@@ -175,20 +166,22 @@ namespace NewGraverForms_Net
             openFileDialog.Filter = "le|*.le";
             if (openFileDialog.ShowDialog() != DialogResult.OK)
             {
-                _logger.LogWarning("Выбор файла отменён");
+                _logger.LogWarning(nameof(button_selectFile_Click) + " Выбор файла отменён");
                 return;
             }
             var pathLeFile = openFileDialog.FileName;
-            _logger.LogInformation("Выбранный файл: " + pathLeFile);
+            _logger.LogInformation(nameof(button_selectFile_Click) + "Выбранный файл: " + pathLeFile);
 
             var result = await _graverService.SendFile(new FileStream(pathLeFile, FileMode.Open));
             if (result)
             {
+                _logger.LogInformation(nameof(button_selectFile_Click) + " Выбор файла отменён");
                 label_selectedFile.Text = Path.GetFileName(pathLeFile);
                 buttonNextTab.Enabled = true;
             }
             else
             {
+                _logger.LogError(nameof(button_selectFile_Click) + " The file was not loaded.");
                 var mb = MessageBox.Show("The file was not loaded.\r\n Improve your connection and repeat!", "Something went wrong!", MessageBoxButtons.OK);
             }
             EnableButtonsWhileLoadFile();
@@ -210,6 +203,33 @@ namespace NewGraverForms_Net
         {
             label_selectedFile.Text = percent.ToString() + "%";
         }
+
+        private void checkBoxAgreeFile_CheckedChanged(object sender, EventArgs e)
+        {
+            buttonNextTab.Enabled = checkBoxAgreeFile.Checked;
+            if (checkBoxAgreeFile.Checked)
+            {
+                _graverService.CheckCurrentFile();
+            }
+        }
+
+        private void buttonSelectOrder_Click(object sender, EventArgs e)
+        {
+            List<Order> orders = new List<Order>();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "json|*.json";
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+            {
+                _logger.LogWarning(nameof(buttonSelectOrder_Click) + " Выбор файла отменён");
+                return;
+            }
+            var pathOrderFile = openFileDialog.FileName;
+            labelOrderFile.Text = Path.GetFileName(pathOrderFile);
+            _logger.LogInformation(nameof(buttonSelectOrder_Click) + "Выбранный файл: " + pathOrderFile);
+            orders = JsonSerializer.Deserialize<List<Order>>(File.OpenRead(pathOrderFile));
+
+        }
+
         #endregion ChoiceFile
 
         #region Axes XY
@@ -230,14 +250,27 @@ namespace NewGraverForms_Net
 
         private void button_set_auto_height_Click(object sender, EventArgs e)
         {
-            int height = _heightService.GetHeightToObj();
-            labelAutoHeight.Text = height.ToString() + " mm";
-            _graverService.SetHeightToObject(height);
+            try
+            {
+                int height = _heightService.GetHeightToObj();
+                labelAutoHeight.Text = height.ToString() + " mm";
+                _graverService.SetHeightToObject(height);
+            }
+            catch (SerialPortException ex)
+            {
+                _logger.LogError(nameof(button_set_auto_height_Click) + ex.Message);
+                labelAutoHeight.Text = "Error";
+            }
+            catch (IOException ioExc)
+            {
+                _logger.LogError(nameof(button_set_auto_height_Click) + ioExc.Message);
+                throw;
+            }
         }
 
         private void buttonAcceptHeight_Click(object sender, EventArgs e)
         {
-            if (string.Compare(textBoxHeight.Text, "", ignoreCase: true, culture: CultureInfo.InvariantCulture) == 0)
+            if (string.Compare(textBoxHeight.Text, "", ignoreCase: true, culture: System.Globalization.CultureInfo.InvariantCulture) == 0)
             {
                 return;
             }
@@ -336,16 +369,60 @@ namespace NewGraverForms_Net
         private void buttonManualStart_Click(object sender, EventArgs e)
         {
             BlockButtonsForMarkingManual();
+            _graverService.StartMarkOnce();
         }
+        CancellationTokenSource cancelTokenSource;
+        public CancellationToken token;
+        private bool IsDetailReady = false;
 
         private void buttonAutoStart_Click(object sender, EventArgs e)
         {
+            DisableButtonsWhileAutoMarking();
+            cancelTokenSource = new CancellationTokenSource();
+            var token = cancelTokenSource.Token;
+
+            var setListenerMode = new Task(() => SetListenerMode(), token);
+            setListenerMode.Start();
+            EnableButtonsWhileAutoMarking();
 
         }
 
+        private void EnableButtonsWhileAutoMarking()
+        {
+            buttonBackTab.Enabled = true;
+            buttonManualStart.Enabled = true; 
+            buttonAutoStart.Enabled = true;
+        }
+
+        private void DisableButtonsWhileAutoMarking()
+        {
+            buttonBackTab.Enabled = false;
+            buttonManualStart.Enabled = false;
+            buttonAutoStart.Enabled = false;
+        }
+
+        private Task SetListenerMode()
+        {
+            while (!token.IsCancellationRequested)
+            {
+                //IsDetailReady = Convert.ToBoolean(RoboReader);
+                if (_graverService.IsGrafAvailableForMarking && IsDetailReady)
+                {
+                    IsDetailReady = false;
+                    var ordersToMark = orders.Where(x => x.IsMarked == false).ToList();
+                    if (ordersToMark.Count() > 0)
+                    {
+                        var order = ordersToMark.First();
+                        _graverService.SetValueBeforeMarking(order);
+                    }
+                    _graverService.StartMarkOnce();
+                }
+            }
+            return Task.CompletedTask;
+        }
         private void buttonAutoStop_Click(object sender, EventArgs e)
         {
-
+            cancelTokenSource.Cancel();
         }
 
         private void OnMarkingFinished()
@@ -361,8 +438,14 @@ namespace NewGraverForms_Net
             buttonAutoStop.Enabled = false;
             buttonManualStart.Enabled = false;
         }
+        private void buttonDetailReady_Click(object sender, EventArgs e)
+        {
+            IsDetailReady = true;
+        }
         #endregion StartPage
+
 
         
     }
+
 }

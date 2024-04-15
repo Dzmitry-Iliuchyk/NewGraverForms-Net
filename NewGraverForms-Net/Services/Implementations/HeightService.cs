@@ -21,7 +21,14 @@ namespace NewGraverForms_Net.Services.Implementations
 
         public int GetHeightToObj()
         {
-            _serialRangeMeter.Open();
+            try
+            {
+                _serialRangeMeter.Open();
+            }
+            catch (IOException ioEx)
+            {
+                throw new SerialPortException(ioEx.Message);
+            }
             int result = 0;
             {
                 string[] rangesToObj = new string[ELEMENTS_FROM_SERIAL];

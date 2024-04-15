@@ -26,7 +26,7 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private async void InitializeComponent()
         {
             textBoxConnectionHost = new TextBox();
             textBoxConnectionPort = new TextBox();
@@ -56,6 +56,10 @@
             tabPageConnection = new TabPage();
             labelIsConnected = new Label();
             tabPageFileChoice = new TabPage();
+            labelOrderFile = new Label();
+            labelSelectedOrderFile = new Label();
+            buttonSelectOrderFile = new Button();
+            checkBoxAgreeFile = new CheckBox();
             tabPageAxesXY = new TabPage();
             checkBoxAxesPosition = new CheckBox();
             tabPageHeight = new TabPage();
@@ -65,6 +69,7 @@
             tabPageStart = new TabPage();
             buttonNextTab = new Button();
             buttonBackTab = new Button();
+            buttonDetailReady = new Button();
             mainTabControl.SuspendLayout();
             tabPageConnection.SuspendLayout();
             tabPageFileChoice.SuspendLayout();
@@ -81,16 +86,17 @@
             textBoxConnectionHost.Name = "textBoxConnectionHost";
             textBoxConnectionHost.PlaceholderText = "255.255.255.255";
             textBoxConnectionHost.Size = new Size(100, 23);
-            textBoxConnectionHost.TabIndex = 15;
+            textBoxConnectionHost.TabIndex = 1;
             textBoxConnectionHost.KeyPress += textBoxConnectionHost_KeyPress;
             // 
             // textBoxConnectionPort
             // 
             textBoxConnectionPort.Location = new Point(176, 28);
+            textBoxConnectionPort.MaxLength = 5;
             textBoxConnectionPort.Name = "textBoxConnectionPort";
             textBoxConnectionPort.PlaceholderText = "65535";
             textBoxConnectionPort.Size = new Size(55, 23);
-            textBoxConnectionPort.TabIndex = 14;
+            textBoxConnectionPort.TabIndex = 2;
             textBoxConnectionPort.KeyPress += textBoxConnectionPort_KeyPress;
             // 
             // buttonConnection
@@ -100,7 +106,7 @@
             buttonConnection.Margin = new Padding(4, 3, 4, 3);
             buttonConnection.Name = "buttonConnection";
             buttonConnection.Size = new Size(88, 27);
-            buttonConnection.TabIndex = 6;
+            buttonConnection.TabIndex = 3;
             buttonConnection.Text = "Connect";
             buttonConnection.UseVisualStyleBackColor = true;
             buttonConnection.Click += buttonConnection_Click;
@@ -128,11 +134,11 @@
             // button_selectFile
             // 
             button_selectFile.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button_selectFile.Location = new Point(26, 148);
+            button_selectFile.Location = new Point(26, 112);
             button_selectFile.Margin = new Padding(2);
             button_selectFile.Name = "button_selectFile";
             button_selectFile.Size = new Size(119, 32);
-            button_selectFile.TabIndex = 5;
+            button_selectFile.TabIndex = 1;
             button_selectFile.Text = "Select a file";
             button_selectFile.UseVisualStyleBackColor = true;
             button_selectFile.Click += button_selectFile_Click;
@@ -347,6 +353,7 @@
             mainTabControl.SelectedIndex = 0;
             mainTabControl.Size = new Size(470, 235);
             mainTabControl.TabIndex = 14;
+            mainTabControl.TabStop = false;
             // 
             // tabPageConnection
             // 
@@ -375,6 +382,10 @@
             // 
             // tabPageFileChoice
             // 
+            tabPageFileChoice.Controls.Add(labelOrderFile);
+            tabPageFileChoice.Controls.Add(labelSelectedOrderFile);
+            tabPageFileChoice.Controls.Add(buttonSelectOrderFile);
+            tabPageFileChoice.Controls.Add(checkBoxAgreeFile);
             tabPageFileChoice.Controls.Add(label_selectedFile);
             tabPageFileChoice.Controls.Add(button_selectFile);
             tabPageFileChoice.Controls.Add(selectedFile);
@@ -386,6 +397,52 @@
             tabPageFileChoice.TabIndex = 1;
             tabPageFileChoice.Text = "ChoiceFile";
             tabPageFileChoice.UseVisualStyleBackColor = true;
+            // 
+            // labelOrderFile
+            // 
+            labelOrderFile.AutoSize = true;
+            labelOrderFile.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            labelOrderFile.Location = new Point(292, 39);
+            labelOrderFile.Margin = new Padding(2, 0, 2, 0);
+            labelOrderFile.Name = "labelOrderFile";
+            labelOrderFile.Size = new Size(98, 20);
+            labelOrderFile.TabIndex = 8;
+            labelOrderFile.Text = "Not selected";
+            // 
+            // labelSelectedOrderFile
+            // 
+            labelSelectedOrderFile.AutoSize = true;
+            labelSelectedOrderFile.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            labelSelectedOrderFile.Location = new Point(264, 9);
+            labelSelectedOrderFile.Margin = new Padding(2, 0, 2, 0);
+            labelSelectedOrderFile.Name = "labelSelectedOrderFile";
+            labelSelectedOrderFile.Size = new Size(141, 20);
+            labelSelectedOrderFile.TabIndex = 7;
+            labelSelectedOrderFile.Text = "Selected order file:";
+            // 
+            // buttonSelectOrderFile
+            // 
+            buttonSelectOrderFile.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            buttonSelectOrderFile.Location = new Point(292, 112);
+            buttonSelectOrderFile.Margin = new Padding(3, 2, 3, 2);
+            buttonSelectOrderFile.Name = "buttonSelectOrderFile";
+            buttonSelectOrderFile.Size = new Size(113, 32);
+            buttonSelectOrderFile.TabIndex = 6;
+            buttonSelectOrderFile.Text = "Select order file";
+            buttonSelectOrderFile.UseVisualStyleBackColor = true;
+            buttonSelectOrderFile.Click += buttonSelectOrder_Click;
+            // 
+            // checkBoxAgreeFile
+            // 
+            checkBoxAgreeFile.AutoSize = true;
+            checkBoxAgreeFile.Location = new Point(292, 184);
+            checkBoxAgreeFile.Margin = new Padding(3, 2, 3, 2);
+            checkBoxAgreeFile.Name = "checkBoxAgreeFile";
+            checkBoxAgreeFile.Size = new Size(147, 19);
+            checkBoxAgreeFile.TabIndex = 5;
+            checkBoxAgreeFile.Text = "I agree with current file";
+            checkBoxAgreeFile.UseVisualStyleBackColor = true;
+            checkBoxAgreeFile.CheckedChanged += checkBoxAgreeFile_CheckedChanged;
             // 
             // tabPageAxesXY
             // 
@@ -470,6 +527,7 @@
             // tabPageStart
             // 
             tabPageStart.BorderStyle = BorderStyle.FixedSingle;
+            tabPageStart.Controls.Add(buttonDetailReady);
             tabPageStart.Controls.Add(buttonAutoStop);
             tabPageStart.Controls.Add(buttonManualStart);
             tabPageStart.Controls.Add(buttonAutoStart);
@@ -505,6 +563,16 @@
             buttonBackTab.Text = "Back";
             buttonBackTab.UseVisualStyleBackColor = true;
             buttonBackTab.Click += buttonBackTab_Click;
+            // 
+            // buttonDetailReady
+            // 
+            buttonDetailReady.Location = new Point(265, 164);
+            buttonDetailReady.Name = "buttonDetailReady";
+            buttonDetailReady.Size = new Size(75, 23);
+            buttonDetailReady.TabIndex = 5;
+            buttonDetailReady.Text = "DetailReady";
+            buttonDetailReady.UseVisualStyleBackColor = true;
+            buttonDetailReady.Click += buttonDetailReady_Click;
             // 
             // MainForm
             // 
@@ -575,6 +643,11 @@
         private CheckBox checkBoxAxesPosition;
         private CheckBox checkBoxHeight;
         private CheckBox checkBoxMaterial;
+        private CheckBox checkBoxAgreeFile;
+        private Button buttonSelectOrderFile;
+        public Label labelOrderFile;
+        private Label labelSelectedOrderFile;
+        private Button buttonDetailReady;
     }
 }
 

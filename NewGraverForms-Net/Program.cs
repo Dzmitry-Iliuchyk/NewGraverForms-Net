@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NewGraverForms_Net.Exceptions.Serial;
 using NewGraverForms_Net.Models;
 using NewGraverForms_Net.Services.Common;
 using NewGraverForms_Net.Services.Implementations;
@@ -31,7 +32,6 @@ namespace NewGraverForms_Net
             AppDomain.CurrentDomain.UnhandledException +=
                 new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             var host = CreateHostBuilder().Build();
-
             ServiceProvider = host.Services;
             Application.Run(ServiceProvider.GetRequiredService<MainForm>());
         }
@@ -76,27 +76,26 @@ namespace NewGraverForms_Net
                         .GetValue<int>(nameof(SerialConfig.BaudRate))));
                     services.AddSingleton<IHeightService, HeightService>();
                     services.AddSingleton<MarkInfo>();
-
-                    services.AddSingleton<IBaseMarkerService, MaxiGrafService>();
-                    //services.AddSingleton<IBaseMarkerService, MockGraverService>();
+                    
+                    //services.AddSingleton<IBaseMarkerService, MaxiGrafService>();
+                    services.AddSingleton<IBaseMarkerService, MockGraverService>();
                 });
         }
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            var logger = ServiceProvider.GetRequiredService<Serilog.ILogger>();
+            var logger = ServiceProvider.GetService<ILogger<MainForm>>();
             try
             {
                 Exception ex = (Exception)e.ExceptionObject;
 
-                logger.Error("Unhandled exception message: \r\n" + ex.Message + "\r\n StackTrace:\r\n" + ex.StackTrace);
+                logger.LogError("Unhandled exception message: \r\n" + ex.Message + "\r\n StackTrace:\r\n" + ex.StackTrace);
                 MessageBox.Show("The program will be closed!\r\n"+ex.ToString(), "Something went wrong!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
             }
             catch (Exception exc)
             {
                 try
                 {
-                    logger.Error("Unhandled exception \r\n"+exc.Message);
+                    logger.LogError("Unhandled exception \r\n"+exc.Message);
                     MessageBox.Show("Fatal Non-UI Error",
                         "Fatal Non-UI Error. Could not write the error to the event log. Reason: "
                         + exc.Message, MessageBoxButtons.OK, MessageBoxIcon.Stop);
